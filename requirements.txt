@@ -1,0 +1,8 @@
+# MATH 463/563 — Final Project
+# Install: pip install -r requirements.txt
+
+numpy>=1.23
+scipy>=1.10
+matplotlib>=3.7
+pillow>=10.0
+scikit-image>=0.21

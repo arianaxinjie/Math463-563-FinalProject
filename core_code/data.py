@@ -4,25 +4,6 @@
 import numpy as np
 from scipy import ndimage
 
-try:
-    from skimage.util import random_noise as _sk_random_noise
-except ImportError:
-    _sk_random_noise = None
-
-
-def _add_noise_numpy(img, noise_type, density, mean, sigma):
-    """Fallback when scikit-image is not installed."""
-    if noise_type == "salt_pepper":
-        out = img.copy()
-        mask = np.random.random(img.shape) < density
-        salt = np.random.random(img.shape) < 0.5
-        out = np.where(mask & salt, 1.0, out)
-        out = np.where(mask & (~salt), 0.0, out)
-        return out
-    if noise_type == "gaussian":
-        return img + np.random.normal(mean, sigma, img.shape)
-    raise ValueError("Unsupported noise type. Use 'salt_pepper' or 'gaussian'.")
-
 
 def load_image(path, resize_factor=1.0):
     if isinstance(path, np.ndarray):
@@ -116,19 +97,19 @@ def add_noise(
     img = np.asarray(img, dtype=np.float64)
     noise_type = noise_type.lower()
 
-    if _sk_random_noise is not None:
-        if noise_type == "salt_pepper":
-            noisy_img = _sk_random_noise(img, mode="s&p", amount=density)
-        elif noise_type == "gaussian":
-            noisy_img = _sk_random_noise(
-                img, mode="gaussian", mean=mean, var=sigma**2
-            )
-        else:
-            raise ValueError(
-                "Unsupported noise type. Use 'salt_pepper' or 'gaussian'."
-            )
+    try:
+        from skimage.util import random_noise as _random_noise
+    except ImportError as err:
+        raise ImportError(
+            "add_noise() requires scikit-image. Install: pip install scikit-image"
+        ) from err
+
+    if noise_type == "salt_pepper":
+        noisy_img = _random_noise(img, mode="s&p", amount=density)
+    elif noise_type == "gaussian":
+        noisy_img = _random_noise(img, mode="gaussian", mean=mean, var=sigma**2)
     else:
-        noisy_img = _add_noise_numpy(img, noise_type, density, mean, sigma)
+        raise ValueError("Unsupported noise type. Use 'salt_pepper' or 'gaussian'.")
 
     return np.clip(noisy_img, 0.0, 1.0)
 

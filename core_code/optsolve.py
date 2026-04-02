@@ -22,8 +22,11 @@ from typing import Any, Mapping
 
 import numpy as np
 
-from .algorithms.algorithm3_admm import run_admm
-from .algorithms.algorithm4_chambolle_pock import run_chambolle_pock
+from .algorithms.algorithm3_admm.implementation import default_admm_state, run_admm
+from .algorithms.algorithm4_chambolle_pock.implementation import (
+    default_chambolle_pock_state,
+    run_chambolle_pock,
+)
 from .data import build_problem
 from .proximal import box_prox
 from .solver import run_solver
@@ -144,23 +147,17 @@ def _warm_primal_dual_dr(model, base: dict, x0: np.ndarray) -> dict:
 
 
 def _warm_admm(model, x0: np.ndarray) -> dict:
-    ops, b = model.ops, model.b
-    m, n = b.shape
+    st = default_admm_state(model)
     u = box_prox(np.asarray(x0, dtype=np.float64))
-    return {
-        "u": u,
-        "y_1": ops.applyK(u),
-        "y_2": ops.applyD1(u),
-        "y_3": ops.applyD2(u),
-        "w": np.zeros((m, n)),
-        "z_1": np.zeros((m, n)),
-        "z_2": np.zeros((m, n)),
-        "z_3": np.zeros((m, n)),
-    }
+    st["u"] = u
+    st["y_1"] = model.ops.applyK(u)
+    st["y_2"] = model.ops.applyD1(u)
+    st["y_3"] = model.ops.applyD2(u)
+    return st
 
 
-def _warm_chambolle_pock(model, base: dict, x0: np.ndarray) -> dict:
-    st = _state_copy(base)
+def _warm_chambolle_pock(model, x0: np.ndarray) -> dict:
+    st = default_chambolle_pock_state(model)
     x = box_prox(np.asarray(x0, dtype=np.float64))
     st["x"] = x
     st["z"] = x.copy()
@@ -210,7 +207,9 @@ def optsolve(
     key = _canonical_method(method)
 
     if key == "primal_dr":
-        from .algorithms.algorithm1_primal_dr import PrimalDouglasRachford
+        from .algorithms.algorithm1_primal_dr.implementation import (
+            PrimalDouglasRachford,
+        )
 
         sol = PrimalDouglasRachford(m, t=p.tprimaldr, rho=p.rhoprimaldr)
         st = sol.initial_state()
@@ -230,7 +229,9 @@ def optsolve(
         )
 
     elif key == "primal_dual_dr":
-        from .algorithms.algorithm2_primal_dual_dr import PrimalDualDouglasRachford
+        from .algorithms.algorithm2_primal_dual_dr.implementation import (
+            PrimalDualDouglasRachford,
+        )
 
         sol = PrimalDualDouglasRachford(
             m, t=p.tprimaldualdr, rho=p.rhoprimaldualdr
@@ -275,16 +276,7 @@ def optsolve(
 
         init = None
         if x0 is not None:
-            bb = m.b
-            mm, nn = bb.shape
-            base = {
-                "x": bb.copy(),
-                "z": bb.copy(),
-                "y1": np.zeros((mm, nn)),
-                "y2": np.zeros((mm, nn)),
-                "y3": np.zeros((mm, nn)),
-            }
-            init = _warm_chambolle_pock(m, base, x0)
+            init = _warm_chambolle_pock(m, x0)
 
         x, obj_hist, info = run_chambolle_pock(
             m,

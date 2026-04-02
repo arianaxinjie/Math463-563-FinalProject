@@ -1,30 +1,56 @@
-# MATH 463/563 —  Final Project
+# MATH 463/563 Final Project
 
-**Public interface:** use the **`core_code`** package and the unified driver **`optsolve`**.  
-If you are **grading or reusing this code**, you only need the sections below through **Hyperparameters (`OptParams`)**.
+This repository contains a modularized version of the original Colab work in
+`finalproject.py`. The main package is `core_code`, and the course-style entry
+point is `optsolve(...)`.
 
-The `scripts/` folder is **for the project authors** (local demos and per-algorithm tuning); it is **not** part of the documented API for external readers.
+## What To Use
 
----
+If you are grading, testing, or reusing the project, use:
+
+- `core_code.optsolve`
+- `core_code.OptParams`
+- helper functions in `core_code` such as `load_image`, `make_kernel`,
+  `generate_blurred_noisy_cfg`, and `show_results`
+
+`utils.py` exists only as a compatibility facade around `core_code`.
 
 ## Requirements
 
-- Python 3.10+ recommended  
+Recommended Python version: `3.10+`
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Or minimally:
 
 ```bash
 pip install numpy scipy matplotlib pillow scikit-image
 ```
 
-`pillow` helps load images from files; parts of the stack work with reduced dependencies — see `core_code` imports.
+## Repository Layout
 
-## Install / import
+- `core_code/`: public package
+- `core_code/algorithms/algorithm1_primal_dr/`: Algorithm 1 implementation and local runner
+- `core_code/algorithms/algorithm2_primal_dual_dr/`: Algorithm 2 implementation and local runner
+- `core_code/algorithms/algorithm3_admm/`: Algorithm 3 implementation and local runner
+- `core_code/algorithms/algorithm4_chambolle_pock/`: Algorithm 4 implementation and local runner
+- `core_code/algorithms/run_common.py`: shared demo/runner utilities
+- `testimages/`: sample images
+- `output/`: saved figures from runner scripts
+- `project_description_2026.pdf`: assignment description
+- `finalproject.py`: original Colab export for reference
 
-Run Python with the **repository root** (the directory that contains `core_code/`) on `sys.path`, for example:
+## Importing The Package
+
+Run Python from the repository root:
 
 ```bash
-cd /path/to/this/repository
-export PYTHONPATH="$(pwd):$PYTHONPATH"   # if needed
-python your_driver.py
+cd <repo-root>
+python
 ```
 
 Then:
@@ -33,63 +59,34 @@ Then:
 import core_code as cc
 ```
 
----
-
-## `optsolve` — unified solver (course-style API)
+## Main Entry Point: `optsolve`
 
 Signature:
 
-```text
-x = optsolve(problem, method, x0, kernel, b, params)
-```
-
-| Argument | Meaning |
-|----------|---------|
-| `problem` | `"l1"` or `"l2"` — data fidelity in the TV model |
-| `method` | Algorithm name (string, case-insensitive); see table below |
-| `x0` | Warm-start image, same shape as `b`, or **`None`** for default initialization |
-| `kernel` | 2D blur kernel (summed to 1) |
-| `b` | 2D observed image |
-| `params` | `cc.OptParams(...)` or a `dict` (supports key `gammal1` as in the project PDF) |
-
-**Return value:** restored image `x` (shape matches `b`). With `return_all=True`: `(x, obj_history, info)`.
-
-### Example (minimal)
-
 ```python
-import core_code as cc
-import numpy as np
-
-# You must supply kernel and b (e.g. from simulate_blur below)
-x0 = None
-p = cc.OptParams(
-    maxiter=500,
-    gamma=0.049,          # TV weight; PDF often calls this gammal1
-    tprimaldr=2.0,
-    rhoprimaldr=0.1,
-)
-x = cc.optsolve("l1", "douglasrachfordprimal", x0, kernel, b, p)
+x = cc.optsolve(problem, method, x0, kernel, b, params)
 ```
 
-### Method names (`method`)
+Arguments:
 
-Examples (several aliases exist — full list in `core_code/optsolve.py`):
+- `problem`: `"l1"` or `"l2"`
+- `method`: algorithm name or alias
+- `x0`: warm start image, or `None`
+- `kernel`: 2D blur kernel
+- `b`: observed blurred/noisy image
+- `params`: `cc.OptParams(...)`, a `dict`, or `None`
 
-| Algorithm | Example `method` string |
-|-----------|-------------------------|
-| 1 — Primal Douglas–Rachford | `douglasrachfordprimal` |
-| 2 — Primal–Dual DR | `douglasrachfordprimaldual` |
-| 3 — ADMM | `admm` |
-| 4 — Chambolle–Pock | `chambollepock` or `cp` |
+Return value:
 
-### Building `kernel` and `b` from a clean image
+- default: restored image `x`
+- with `return_all=True`: `(x, obj_history, info)`
 
-Use **`core_code`** only (no `scripts/` required):
+Example:
 
 ```python
 import core_code as cc
 
-img = cc.load_image("cameraman.jpg")   # or pass a NumPy array
+img = cc.load_image("testimages/cameraman.jpg")
 kernel, x_blur, b = cc.generate_blurred_noisy_cfg(
     x_true=img,
     kernel_kind="gaussian",
@@ -99,48 +96,101 @@ kernel, x_blur, b = cc.generate_blurred_noisy_cfg(
     noise_sigma=0.001,
     mode="periodic",
 )
-x = cc.optsolve("l2", "admm", None, kernel, b, cc.OptParams(maxiter=300, verbose=False))
+
+params = cc.OptParams(
+    maxiter=500,
+    gamma=0.01,
+    tprimaldr=2.0,
+    rhoprimaldr=0.1,
+)
+
+x, hist, info = cc.optsolve(
+    "l2",
+    "douglasrachfordprimal",
+    None,
+    kernel,
+    b,
+    params,
+    return_all=True,
+)
 ```
 
-### Hyperparameters (`OptParams`)
+## Supported Methods
 
-Defaults and fields are defined in `core_code/optsolve.py` (`OptParams` dataclass). Common fields:
+Canonical methods accepted by `optsolve`:
 
-- `maxiter`, `tol`, `verbose`, `gamma` (alias `gammal1` in dicts)
-- Primal DR: `tprimaldr`, `rhoprimaldr`
-- Primal–Dual DR: `tprimaldualdr`, `rhoprimaldualdr`
-- ADMM: `tadmm`, `rhoadmm`
-- Chambolle–Pock: set both `tcp` and `scp` for fixed steps, or use `cp_step_theta` for automatic `t`, `s`
+- Algorithm 1: `douglasrachfordprimal`, `drprimal`, `primaldr`, `algorithm1`
+- Algorithm 2: `douglasrachfordprimaldual`, `primaldualdr`, `primaldual`, `algorithm2`
+- Algorithm 3: `admm`, `dualdouglasrachford`, `algorithm3`
+- Algorithm 4: `chambollepock`, `cp`, `primaldualhybridgradient`, `algorithm4`
 
-Merge a plain dict with defaults: `cc.merge_params({...})`.
+## `OptParams`
 
-### Quick terminal smoke test
+Defined in `core_code/optsolve.py`.
+
+Main fields:
+
+- `maxiter`
+- `tol`
+- `verbose`
+- `compute_obj_every`
+- `gamma`
+- `tprimaldr`, `rhoprimaldr`
+- `tprimaldualdr`, `rhoprimaldualdr`
+- `tadmm`, `rhoadmm`
+- `tcp`, `scp`, `cp_step_theta`
+
+`dict` input also supports:
+
+- `gammal1` as an alias for `gamma`
+- `t_primal_dr`, `rho_primal_dr`
+- `t_primal_dual_dr`, `rho_primal_dual_dr`
+- `t_admm`, `rho_admm`
+- `t_cp`, `s_cp`
+
+## Useful Public Helpers
+
+Available directly from `core_code`:
+
+- `load_image`
+- `make_kernel`
+- `add_noise`
+- `generate_blurred_noisy_cfg`
+- `build_problem`
+- `show_results`
+- `compare_algorithms`
+- `compute_psnr`
+- `chambolle_pock_step_sizes`
+
+You can also instantiate solver classes directly:
+
+- `PrimalDouglasRachford`
+- `PrimalDualDouglasRachford`
+- `ADMM`
+- `ChambollePock`
+
+## Per-Algorithm Local Runners
+
+These are mainly for project authors to tune hyperparameters and save demo figures.
+Run them from the repository root.
+
+Examples:
 
 ```bash
-cd /path/to/this/repository
-python -c "
-import numpy as np, core_code as cc
-b = np.random.rand(32, 32)
-k = np.ones((5,5)); k /= k.sum()
-p = cc.OptParams(maxiter=20, verbose=False, tol=1e-2)
-x = cc.optsolve('l2', 'douglasrachfordprimal', None, k, b, p)
-print('OK', x.shape)
-"
+cd <repo-root>
+python -m core_code.algorithms.algorithm1_primal_dr.run
+python -m core_code.algorithms.algorithm4_chambolle_pock.run testimages/mcgill.jpg
 ```
 
----
+Available runner modules:
 
-## Repository layout (for reference)
+- `core_code.algorithms.algorithm1_primal_dr.run`
+- `core_code.algorithms.algorithm2_primal_dual_dr.run`
+- `core_code.algorithms.algorithm3_admm.run`
+- `core_code.algorithms.algorithm4_chambolle_pock.run`
 
-| Path | Role |
-|------|------|
-| `core_code/` | **Public package**: algorithms, `optsolve`, `build_problem`, `generate_blurred_noisy_cfg`, `load_image`, `show_results`, … |
-| `scripts/` | **Internal** — authors’ convenience runners only (not required to use `optsolve`) |
-| `testimages/` | Sample images for experiments |
-| `comp463finalproject.py` | Legacy Colab export (reference) |
+## Notes
 
----
-
-## For project authors only (`scripts/`)
-
-The team uses `scripts/run_algorithm1.py` … `run_algorithm4.py` plus `run_common.py` to load `testimages/`, tweak per-person `HYPERPARAMETERS`, and save figures under `output/`. **Graders and external users can ignore this directory** and call `optsolve` as above.
+- The public package is `core_code`; the runner files are not required to use the algorithms.
+- The code is organized to preserve the final effective logic from the original Colab notebook while making the structure cleaner.
+- `utils.py` re-exports the public API and preserves the old `run_admm` / `run_chambolle_pock` calling style.

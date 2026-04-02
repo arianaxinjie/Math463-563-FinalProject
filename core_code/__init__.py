@@ -16,8 +16,9 @@ MATH 463 / COMP 463 image deblurring with TV regularisation.
     x_sol, obj_hist, info = solver.solve(maxiter=500, tol=5e-5)
 
 Low-level step functions (``primal_dr_step``, etc.) remain available under
-``core_code.algorithms`` for custom loops. Implementations live in
-``algorithm1_primal_dr`` … ``algorithm4_chambolle_pock`` modules.
+``core_code.algorithms`` for custom loops. Implementations now live under
+``core_code.algorithms.algorithm1_primal_dr`` …
+``algorithm4_chambolle_pock``.
 """
 
 from .algorithms import (

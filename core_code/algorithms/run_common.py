@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Shared helpers for ``run_algorithm1.py`` … ``run_algorithm4.py``.
+Shared helpers for the per-algorithm ``run.py`` entrypoints.
 
 Keeps image paths, ``testimages`` handling, and package import logic in one place.
-Each teammate tunes **hyperparameters only inside their own** ``run_algorithmN.py``
+Each teammate tunes **hyperparameters only inside their own** ``algorithmN/run.py``
 (``PROBLEM`` / ``SOLVER`` / ``CP_STEPS`` blocks), passing values into
 ``build_demo_model`` and the solver constructors there.
 
@@ -11,8 +11,8 @@ The code package is expected at the repo root as ``core_code`` (or legacy name
 ``final_project``). Default blur kwargs used when building problems are
 ``_DEFAULT_BLUR_KWARGS`` below; per-script ``PROBLEM["blur"]`` overrides them.
 
-This file lives under ``scripts/``; the repository root is its parent (where
-``testimages``, ``output``, and the Python package directory live).
+This file lives under ``core_code/algorithms/``; the repository root is its
+grandparent (where ``testimages``, ``output``, and the Python package directory live).
 """
 
 from __future__ import annotations
@@ -23,10 +23,22 @@ from pathlib import Path
 import numpy as np
 
 # Repository root (contains testimages, core_code or final_project, output)
-_ROOT = Path(__file__).resolve().parent.parent
+_ROOT = Path(__file__).resolve().parent.parent.parent
 _TESTIMAGES = _ROOT / "testimages"
 _DEFAULT_NAME = "cameraman.jpg"
 OUTPUT_DIR = _ROOT / "output"
+DEFAULT_PROBLEM = {
+    "gamma": 0.01,
+    "fidelity": "l2",
+    "blur": {
+        "kernel_kind": "gaussian",
+        "kernel_size": 15,
+        "kernel_sigma": 3.0,
+        "noise_type": "gaussian",
+        "noise_sigma": 0.001,
+        "mode": "periodic",
+    },
+}
 
 
 def ensure_matplotlib() -> None:
@@ -56,7 +68,7 @@ def get_final_project():
             continue
     raise ModuleNotFoundError(
         f"No package 'core_code' or 'final_project' under {_ROOT}. "
-        "Expected a directory core_code/ (or final_project/) with __init__.py next to scripts/."
+        "Expected a directory core_code/ (or final_project/) with __init__.py at the repo root."
     )
 
 
@@ -125,7 +137,7 @@ def load_demo_image(fp, argv: list[str]) -> tuple[np.ndarray, str]:
 
 
 # Defaults for ``generate_blurred_noisy_cfg``; override per-algorithm via ``blur=`` in
-# ``build_demo_model`` (each ``run_algorithm*.py`` passes its own dict).
+# ``build_demo_model`` (each ``algorithm*/run.py`` passes its own dict).
 _DEFAULT_BLUR_KWARGS: dict = {
     "kernel_kind": "gaussian",
     "kernel_size": 15,
@@ -180,3 +192,61 @@ def figure_path(algorithm_index: int) -> Path:
     """Path for saved figure ``output/algorithm{N}_result.png``."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     return OUTPUT_DIR / f"algorithm{algorithm_index}_result.png"
+
+
+def run_algorithm_demo(
+    *,
+    algorithm_index: int,
+    title: str,
+    build_solver,
+    solve_kwargs: dict,
+    argv: list[str] | None = None,
+    rng_seed: int = 42,
+    problem: dict | None = None,
+) -> tuple[np.ndarray, list[float], dict]:
+    """
+    Shared runner for the per-algorithm ``run.py`` entrypoints.
+
+    ``build_solver(fp, model)`` must return a solver instance, or a
+    ``(solver, extra_solve_kwargs)`` pair when a specific script needs to add
+    parameters dynamically.
+    """
+    ensure_matplotlib()
+    fp = get_final_project()
+
+    np.random.seed(rng_seed)
+    cli_args = sys.argv if argv is None else argv
+    problem_cfg = DEFAULT_PROBLEM if problem is None else problem
+
+    img, source_note = load_demo_image(fp, cli_args)
+    print(f"[input image] {source_note}")
+
+    b, model = build_demo_model(
+        fp,
+        img,
+        gamma=problem_cfg["gamma"],
+        fidelity=problem_cfg["fidelity"],
+        blur=problem_cfg["blur"],
+    )
+
+    solver_info = build_solver(fp, model)
+    extra_solve_kwargs = {}
+    if isinstance(solver_info, tuple):
+        solver, extra_solve_kwargs = solver_info
+    else:
+        solver = solver_info
+
+    x_sol, obj_hist, info = solver.solve(**{**solve_kwargs, **extra_solve_kwargs})
+
+    out = figure_path(algorithm_index)
+    print("PSNR:", fp.compute_psnr(img, x_sol), "dB")
+    fp.show_results(
+        img,
+        b,
+        x_sol,
+        title,
+        obj_hist,
+        save_figure=out,
+    )
+    print(f"[saved figure] {out.resolve()}")
+    return x_sol, obj_hist, info

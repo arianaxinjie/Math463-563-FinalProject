@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Unified iterative loop shared by all algorithms."""
+"""
+Unified iterative loop shared by all algorithms.
+
+This preserves the original notebook behavior: objective values are evaluated on
+``box_prox(x_current)``, convergence is checked on the raw iterate returned by
+the algorithm-specific step, and the final output is projected back to ``[0, 1]``.
+"""
 
 import time
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Four splitting algorithms for TV deblurring (module names match algorithm1–4)."""
+"""Four splitting algorithms organized as one folder per algorithm."""
 
 from .algorithm1_primal_dr import PrimalDouglasRachford, primal_dr_step
 from .algorithm2_primal_dual_dr import PrimalDualDouglasRachford, primal_dual_dr_step

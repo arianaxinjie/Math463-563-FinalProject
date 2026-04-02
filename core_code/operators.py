@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""FFT-diagonal periodic convolution and A = [K; D1; D2]."""
+"""
+FFT-diagonal periodic convolution utilities and the stacked operator
+``A = [K; D1; D2]`` from the original Colab implementation.
+"""
 
 import numpy as np
 from numpy.fft import fft2, ifft2
@@ -84,7 +87,13 @@ class LinearOperators:
         )
 
     def precompute_inverse(self, t):
-        """Eigenvalues of (I + t^2 A^T A)."""
+        """
+        Eigenvalues of ``I + t^2 A^T A``.
+
+        Primal DR and Primal-Dual DR use their algorithmic ``t`` here; ADMM
+        intentionally calls this with ``t=1`` because its linear system is
+        ``I + A^T A`` in the final notebook derivation.
+        """
         return (
             np.ones((self.num_rows, self.num_cols))
             + t**2 * self.eig_KT * self.eig_K
@@ -93,5 +102,5 @@ class LinearOperators:
         )
 
     def solve_system(self, rhs, eig_inv):
-        """(I + t^2 A^T A)^{-1} rhs  via FFT."""
+        """Apply the FFT-diagonal inverse defined by ``eig_inv`` to ``rhs``."""
         return np.real(ifft2(fft2(rhs) / eig_inv))

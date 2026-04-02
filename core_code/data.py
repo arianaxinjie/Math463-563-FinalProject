@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Image I/O, blur kernels, synthetic observations."""
+"""Image I/O, blur kernels, and synthetic observations from the Colab baseline."""
 
 import numpy as np
 from scipy import ndimage
 
 
 def load_image(path, resize_factor=1.0):
+    """Load an image or array, convert to grayscale, and normalize to [0, 1]."""
     if isinstance(path, np.ndarray):
         img_array = path
     else:
@@ -94,6 +95,7 @@ def add_noise(
     mean=0.0,
     sigma=0.01,
 ):
+    """Add salt-and-pepper or Gaussian noise, matching the notebook helper."""
     img = np.asarray(img, dtype=np.float64)
     noise_type = noise_type.lower()
 
@@ -127,6 +129,7 @@ def generate_blurred_noisy_cfg(
     noise_sigma=0.01,
     mode="periodic",
 ):
+    """Generate ``(kernel, x_blur, b)`` exactly like the original notebook helper."""
     x_true = np.asarray(x_true, dtype=np.float64)
     if x_true.ndim != 2:
         raise ValueError("x_true must be a 2D grayscale image.")

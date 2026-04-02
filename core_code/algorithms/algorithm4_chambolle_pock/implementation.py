@@ -11,9 +11,22 @@ from __future__ import annotations
 
 import numpy as np
 
-from ..problem import DeblurProblem
-from ..proximal import prox_f, prox_g_conjugate
-from ..solver import run_solver
+from ...problem import DeblurProblem
+from ...proximal import prox_f, prox_g_conjugate
+from ...solver import run_solver
+
+
+def default_chambolle_pock_state(model: DeblurProblem) -> dict:
+    """Default CP initialization shared by wrappers and warm starts."""
+    b = model.b
+    m, n = b.shape
+    return {
+        "x": b.copy(),
+        "z": b.copy(),
+        "y1": np.zeros((m, n)),
+        "y2": np.zeros((m, n)),
+        "y3": np.zeros((m, n)),
+    }
 
 
 def chambolle_pock_step(ops, b, gamma, t, s, problem):
@@ -120,7 +133,6 @@ def run_chambolle_pock(
     x_sol, obj_history, info
     """
     ops, b = model.ops, model.b
-    m, n = b.shape
 
     # A safe rough check for step sizes:
     # We need s * t * ||A||^2 < 1.
@@ -134,13 +146,7 @@ def run_chambolle_pock(
         print(f"{'='*60}")
 
     if init_state is None:
-        init_state = {
-            "x": b.copy(),  # x^0
-            "z": b.copy(),  # z^0, often initialized as x^0
-            "y1": np.zeros((m, n)),  # dual for Kx
-            "y2": np.zeros((m, n)),  # dual for D1x
-            "y3": np.zeros((m, n)),  # dual for D2x
-        }
+        init_state = default_chambolle_pock_state(model)
 
     step_fn = chambolle_pock_step(ops, b, model.gamma, t, s, model.problem)
 
@@ -164,6 +170,9 @@ class ChambollePock:
         self.model = model
         self.t = float(t)
         self.s = float(s)
+
+    def initial_state(self) -> dict:
+        return default_chambolle_pock_state(self.model)
 
     def solve(self, maxiter=500, tol=1e-6, verbose=True, init_state=None):
         return run_chambolle_pock(

@@ -35,9 +35,25 @@ from __future__ import annotations
 
 import numpy as np
 
-from ..problem import DeblurProblem
-from ..proximal import prox_f, prox_g
-from ..solver import run_solver
+from ...problem import DeblurProblem
+from ...proximal import prox_f, prox_g
+from ...solver import run_solver
+
+
+def default_admm_state(model: DeblurProblem) -> dict:
+    """Default ADMM initialization shared by wrappers and warm starts."""
+    ops, b = model.ops, model.b
+    m, n = b.shape
+    return {
+        "u": b.copy(),
+        "y_1": ops.applyK(b),
+        "y_2": ops.applyD1(b),
+        "y_3": ops.applyD2(b),
+        "w": np.zeros((m, n)),
+        "z_1": np.zeros((m, n)),
+        "z_2": np.zeros((m, n)),
+        "z_3": np.zeros((m, n)),
+    }
 
 
 def admm_step(ops, b, gamma, t, rho, problem, eig_inv):
@@ -151,7 +167,6 @@ def run_admm(
         Same as :func:`core_code.solver.run_solver`.
     """
     ops, b = model.ops, model.b
-    m, n = b.shape
 
     # ADMM's x-update solves (I + A^T A)x = rhs, NOT (I + t^2 A^T A)x = rhs
     # (the t cancels when you divide the augmented Lagrangian grad by t)
@@ -160,16 +175,7 @@ def run_admm(
 
     # initialize: u^0 = b, y^0 = Ab, dual variables w^0 = z^0 = 0
     if init_state is None:
-        init_state = {
-            "u": b.copy(),
-            "y_1": ops.applyK(b),
-            "y_2": ops.applyD1(b),
-            "y_3": ops.applyD2(b),
-            "w": np.zeros((m, n)),
-            "z_1": np.zeros((m, n)),
-            "z_2": np.zeros((m, n)),
-            "z_3": np.zeros((m, n)),
-        }
+        init_state = default_admm_state(model)
 
     step_fn = admm_step(ops, b, model.gamma, t, rho, model.problem, eig_inv)
 
@@ -201,6 +207,9 @@ class ADMM:
         self.model = model
         self.t = float(t)
         self.rho = float(rho)
+
+    def initial_state(self) -> dict:
+        return default_admm_state(self.model)
 
     def solve(self, maxiter=500, tol=1e-6, verbose=True, init_state=None):
         return run_admm(

@@ -13,9 +13,9 @@ from __future__ import annotations
 
 import numpy as np
 
-from ..problem import DeblurProblem
-from ..proximal import prox_f, prox_g_conjugate
-from ..solver import run_solver
+from ...problem import DeblurProblem
+from ...proximal import prox_f, prox_g_conjugate
+from ...solver import run_solver
 
 
 def primal_dual_dr_step(ops, b, gamma, t, rho, problem, eig_inv):

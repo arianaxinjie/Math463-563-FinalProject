@@ -14,10 +14,10 @@ from __future__ import annotations
 
 import numpy as np
 
-from ..operators import apply_periodic_conv
-from ..problem import DeblurProblem
-from ..proximal import prox_f, prox_g
-from ..solver import run_solver
+from ...operators import apply_periodic_conv
+from ...problem import DeblurProblem
+from ...proximal import prox_f, prox_g
+from ...solver import run_solver
 
 
 def primal_dr_step(ops, b, gamma, t, rho, problem, eig_inv):

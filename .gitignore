@@ -1,10 +1,25 @@
-# Python cache
+# Python cache and local environments
 __pycache__/
 *.py[cod]
 
-# macOS
+# macOS filesystem metadata
 .DS_Store
+**/.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
 
 # Local generated outputs
-output/*.png
-**/.DS_Store
+output/
+
+# LaTeX build artifacts
+docs/*.aux
+docs/*.fdb_latexmk
+docs/*.fls
+docs/*.log
+docs/*.out
+docs/*.synctex.gz
+docs/*.toc

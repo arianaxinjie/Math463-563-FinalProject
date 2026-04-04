@@ -1,0 +1,136 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{amsmath}
+\title{Grid Search Report for Deblurring on Cameraman with Gaussian Blur and Salt-and-Pepper Noise}
+\author{Automated Experimental Report}
+\date{\today}
+\begin{document}
+\maketitle
+
+\section{Objective and Experimental Setting}
+The goal of this study is to tune the four optimization algorithms in the project on a fixed restoration benchmark:
+\begin{itemize}
+\item image: \texttt{cameraman}
+\item blur: Gaussian blur with kernel size $15$ and standard deviation $3.0$
+\item noise: salt-and-pepper noise with density $0.05$
+\item boundary handling: periodic
+\item iteration budget per trial: $500$
+\item stopping tolerance: $10^{-6}$
+\end{itemize}
+
+The observation used in all experiments is shown in Figure~\ref{fig:observation}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{grid_search_report_assets/observation.png}
+\caption{Original image and the blurred/noisy observation used as the search target.}
+\label{fig:observation}
+\end{figure}
+
+\section{Default Parameters}
+The project default parameter values are taken directly from \texttt{OptParams} in \texttt{core\_code/optsolve.py}:
+\begin{itemize}
+\item common defaults: $\gamma=0.049$, \texttt{maxiter}$=500$, \texttt{tol}$=1e-06$, \texttt{compute\_obj\_every}$=1$
+\item Primal DR: $t=2.0$, $\rho=0.1$
+\item Primal-Dual DR: $t=2.0$, $\rho=0.1$
+\item ADMM: $t=1.0$, $\rho=1.0$
+\item Chambolle-Pock: \texttt{cp\_step\_theta}$=0.5$ with internally derived $(t,s)$
+\end{itemize}
+
+\section{Search Procedure}
+We used a two-stage search strategy.
+
+\subsection{Stage 1: Coarse Global Grid}
+Stage 1 searched all four algorithms on both $l_1$ and $l_2$ fidelity models, for a total of $5412$ unique trials.
+This stage identified the main promising parameter regions.
+
+\subsection{Stage 2: Local Refinement}
+Stage 2 refined the neighborhoods around the stage-1 winners:
+\begin{itemize}
+\item $l_1$ refinement: $910$ trials
+\item $l_2$ refinement: $1136$ trials
+\end{itemize}
+
+The refinement improved the best $l_1$ solutions substantially, but did not beat the stage-1 $l_2$ optima. Therefore, the final $l_2$ recommendations remain the stage-1 best settings.
+
+\section{Final Best Parameters}
+\begin{table}[H]
+\centering
+\begin{tabular}{llll}
+\toprule
+Problem & Algorithm & PSNR (dB) & Final Parameters \\
+\midrule
+L1 & Primal DR & 26.8231 & $\gamma=0.001$, $t=1.0$, $\rho=1.75$ \\
+L1 & Primal-Dual DR & 27.7613 & $\gamma=0.0015$, $t=5.0$, $\rho=2.0$ \\
+L1 & ADMM & 26.3391 & $\gamma=0.003$, $t=3.0$, $\rho=1.5$ \\
+L1 & Chambolle-Pock & 25.2397 & $\gamma=0.0035$, $\theta=0.99$, ratio$=2.5$ \\
+L2 & Primal DR & 21.5789 & $\gamma=0.04$, $t=1.0$, $\rho=0.5$ \\
+L2 & Primal-Dual DR & 21.5807 & $\gamma=0.04$, $t=4.0$, $\rho=0.5$ \\
+L2 & ADMM & 21.5782 & $\gamma=0.04$, $t=3.0$, $\rho=1.5$ \\
+L2 & Chambolle-Pock & 21.5758 & $\gamma=0.04$, $\theta=0.3$, ratio$=0.5$ \\
+\bottomrule
+\end{tabular}
+\caption{Final recommended parameters after combining the coarse and refinement stages.}
+\end{table}
+
+\section{Rendered Reconstructions}
+Figures~\ref{fig:l1-grid} and \ref{fig:l2-grid} render the recovered images for every algorithm under both the default settings and the final tuned settings.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{grid_search_report_assets/l1_results_grid.png}
+\caption{$l_1$ reconstructions: observed input, default reconstruction, and tuned reconstruction for each algorithm.}
+\label{fig:l1-grid}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{grid_search_report_assets/l2_results_grid.png}
+\caption{$l_2$ reconstructions: observed input, default reconstruction, and tuned reconstruction for each algorithm.}
+\label{fig:l2-grid}
+\end{figure}
+
+\section{Improvement Over Default Values}
+Figure~\ref{fig:psnr-compare} compares the final tuned PSNR against the project default PSNR for every algorithm/problem pair.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{grid_search_report_assets/default_vs_tuned_psnr.png}
+\caption{PSNR under project default values versus the final tuned values. The labels above each pair show the PSNR gain relative to the defaults.}
+\label{fig:psnr-compare}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lllll}
+\toprule
+Problem & Algorithm & Default & Tuned & Gain \\
+\midrule
+L1 & Primal DR & 21.5467 & 26.8210 & 5.2743 \\
+L1 & Primal-Dual DR & 23.7576 & 27.7736 & 4.0160 \\
+L1 & ADMM & 24.4052 & 26.3053 & 1.9001 \\
+L1 & Chambolle-Pock & 23.7636 & 25.2445 & 1.4809 \\
+L2 & Primal DR & 12.3110 & 21.5062 & 9.1951 \\
+L2 & Primal-Dual DR & 21.5024 & 21.5269 & 0.0245 \\
+L2 & ADMM & 21.4877 & 21.5042 & 0.0165 \\
+L2 & Chambolle-Pock & 21.4889 & 21.4996 & 0.0107 \\
+\bottomrule
+\end{tabular}
+\caption{Numerical PSNR gains relative to the default project parameters.}
+\end{table}
+
+\section{Main Findings}
+\begin{itemize}
+\item The best overall setting is \textbf{Primal-Dual DR with $l_1$ fidelity}, reaching PSNR $27.7613$ dB.
+\item The best final $l_1$ parameters are: $\gamma=0.0015$, $t=5.0$, $\rho=2.0$.
+\item For this salt-and-pepper noise setting, $l_1$ fidelity is clearly stronger than $l_2$.
+\item Stage 2 meaningfully improved the $l_1$ solutions, especially for Primal DR and Primal-Dual DR.
+\item Stage 2 did not improve the best $l_2$ results, so the coarse-grid $l_2$ optima were already sufficiently accurate.
+\end{itemize}
+
+\end{document}

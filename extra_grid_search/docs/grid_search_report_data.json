@@ -1,0 +1,188 @@
+{
+  "default_params": {
+    "compute_obj_every": 1,
+    "cp_step_theta": 0.5,
+    "gamma": 0.049,
+    "maxiter": 500,
+    "rhoadmm": 1.0,
+    "rhoprimaldr": 0.1,
+    "rhoprimaldualdr": 0.1,
+    "scp": null,
+    "tadmm": 1.0,
+    "tcp": null,
+    "tol": 1e-06,
+    "tprimaldr": 2.0,
+    "tprimaldualdr": 2.0,
+    "verbose": true
+  },
+  "final_best": {
+    "admm:l1": {
+      "default_psnr": 24.405177266147753,
+      "params": {
+        "compute_obj_every": 10,
+        "gamma": 0.003,
+        "maxiter": 500,
+        "rhoadmm": 1.5,
+        "tadmm": 3.0,
+        "tol": 1e-06,
+        "verbose": false
+      },
+      "psnr": 26.33914016,
+      "search_values": {
+        "gamma": 0.003,
+        "problem": "l1",
+        "rhoadmm": 1.5,
+        "tadmm": 3.0
+      },
+      "tuned_psnr": 26.305286370208677
+    },
+    "admm:l2": {
+      "default_psnr": 21.487697237915015,
+      "params": {
+        "compute_obj_every": 10,
+        "gamma": 0.04,
+        "maxiter": 500,
+        "rhoadmm": 1.5,
+        "tadmm": 3.0,
+        "tol": 1e-06,
+        "verbose": false
+      },
+      "psnr": 21.57815523,
+      "search_values": {
+        "gamma": 0.04,
+        "problem": "l2",
+        "rhoadmm": 1.5,
+        "tadmm": 3.0
+      },
+      "tuned_psnr": 21.50423565430239
+    },
+    "chambolle_pock:l1": {
+      "default_psnr": 23.763626377628206,
+      "params": {
+        "compute_obj_every": 10,
+        "cp_step_theta": 0.99,
+        "gamma": 0.0035,
+        "maxiter": 500,
+        "scp": 0.8750446416687496,
+        "tcp": 0.14000714266699993,
+        "tol": 1e-06,
+        "verbose": false
+      },
+      "psnr": 25.2396918,
+      "search_values": {
+        "cp_ratio": 2.5,
+        "cp_theta": 0.99,
+        "gamma": 0.0035,
+        "operator_norm_sq": 8.00000000090698,
+        "problem": "l1",
+        "scp": 0.8750446416687496,
+        "tcp": 0.14000714266699993
+      },
+      "tuned_psnr": 25.244518172124906
+    },
+    "chambolle_pock:l2": {
+      "default_psnr": 21.48891613107719,
+      "params": {
+        "compute_obj_every": 10,
+        "cp_step_theta": 0.3,
+        "gamma": 0.04,
+        "maxiter": 500,
+        "scp": 0.05303300858598482,
+        "tcp": 0.2121320343439393,
+        "tol": 1e-06,
+        "verbose": false
+      },
+      "psnr": 21.57578592,
+      "search_values": {
+        "cp_ratio": 0.5,
+        "cp_theta": 0.3,
+        "gamma": 0.04,
+        "operator_norm_sq": 8.00000000090698,
+        "problem": "l2",
+        "scp": 0.05303300858598482,
+        "tcp": 0.2121320343439393
+      },
+      "tuned_psnr": 21.499614494564383
+    },
+    "primal_dr:l1": {
+      "default_psnr": 21.546678002838682,
+      "params": {
+        "compute_obj_every": 10,
+        "gamma": 0.001,
+        "maxiter": 500,
+        "rhoprimaldr": 1.75,
+        "tol": 1e-06,
+        "tprimaldr": 1.0,
+        "verbose": false
+      },
+      "psnr": 26.82306467,
+      "search_values": {
+        "gamma": 0.001,
+        "problem": "l1",
+        "rhoprimaldr": 1.75,
+        "tprimaldr": 1.0
+      },
+      "tuned_psnr": 26.82098238364887
+    },
+    "primal_dr:l2": {
+      "default_psnr": 12.311038252758328,
+      "params": {
+        "compute_obj_every": 10,
+        "gamma": 0.04,
+        "maxiter": 500,
+        "rhoprimaldr": 0.5,
+        "tol": 1e-06,
+        "tprimaldr": 1.0,
+        "verbose": false
+      },
+      "psnr": 21.57891831,
+      "search_values": {
+        "gamma": 0.04,
+        "problem": "l2",
+        "rhoprimaldr": 0.5,
+        "tprimaldr": 1.0
+      },
+      "tuned_psnr": 21.506161778273455
+    },
+    "primal_dual_dr:l1": {
+      "default_psnr": 23.75758050802454,
+      "params": {
+        "compute_obj_every": 10,
+        "gamma": 0.0015,
+        "maxiter": 500,
+        "rhoprimaldualdr": 2.0,
+        "tol": 1e-06,
+        "tprimaldualdr": 5.0,
+        "verbose": false
+      },
+      "psnr": 27.76128086,
+      "search_values": {
+        "gamma": 0.0015,
+        "problem": "l1",
+        "rhoprimaldualdr": 2.0,
+        "tprimaldualdr": 5.0
+      },
+      "tuned_psnr": 27.77355381588674
+    },
+    "primal_dual_dr:l2": {
+      "default_psnr": 21.50236438884282,
+      "params": {
+        "compute_obj_every": 10,
+        "gamma": 0.04,
+        "maxiter": 500,
+        "rhoprimaldualdr": 0.5,
+        "tol": 1e-06,
+        "tprimaldualdr": 4.0,
+        "verbose": false
+      },
+      "psnr": 21.58073203,
+      "search_values": {
+        "gamma": 0.04,
+        "problem": "l2",
+        "rhoprimaldualdr": 0.5,
+        "tprimaldualdr": 4.0
+      },
+      "tuned_psnr": 21.526877142008445
+    }
+  }
+}

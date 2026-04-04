@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Extra Grid Search and Line Search Guide</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --panel: #fffaf2;
+      --ink: #1f2933;
+      --muted: #5b6975;
+      --accent: #8c3b1f;
+      --rule: #d9cbb6;
+      --code-bg: #f1e6d9;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+      background: linear-gradient(180deg, #f8f3ec 0%, var(--bg) 100%);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 42px 20px 72px;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--rule);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 24px rgba(37, 27, 17, 0.05);
+    }
+
+    h1, h2 {
+      margin-top: 0;
+      line-height: 1.2;
+    }
+
+    code, pre {
+      font-family: "SFMono-Regular", "Menlo", "Monaco", monospace;
+      background: var(--code-bg);
+      color: #2f3a46;
+      border-radius: 8px;
+    }
+
+    code {
+      padding: 0.12rem 0.35rem;
+    }
+
+    pre {
+      padding: 14px 16px;
+      overflow-x: auto;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <h1>Extra Grid Search and Line Search</h1>
+      <p class="muted">
+        The experimental search utilities now live under <code>extra_grid_search/</code>.
+        This keeps the core solver package cleaner while preserving compatibility wrappers
+        under the old module paths.
+      </p>
+    </section>
+
+    <section>
+      <h2>Run Grid Search</h2>
+      <pre>python -m extra_grid_search.grid_search</pre>
+      <p>
+        Stage-2 search-space JSON files are stored in
+        <code>extra_grid_search/configs/</code>, and related reports live in
+        <code>extra_grid_search/docs/</code>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Monitor Progress</h2>
+      <pre>python -m extra_grid_search.grid_search_status output/grid_search/cameraman_gaussian_sp
+python -m extra_grid_search.grid_search_dashboard --output-dir output/grid_search/full_run_l1</pre>
+    </section>
+
+    <section>
+      <h2>Run Line Search</h2>
+      <pre>python -m extra_grid_search.line_search</pre>
+      <p>
+        This script is an offline parameter sweep for Algorithm 1's
+        <code>tprimaldr</code>, rather than an in-iteration backtracking rule.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

@@ -41,10 +41,10 @@ class OptParams:
     """
 
     maxiter: int = 500
-    tol: float = 1e-6
+    tol: float = 1e-4
     verbose: bool = True
     compute_obj_every: int = 1
-    gamma: float = 0.049
+    gamma: float = 0.01
     # Primal Douglas–Rachford (Algorithm 1)
     tprimaldr: float = 2.0
     rhoprimaldr: float = 0.1
@@ -104,23 +104,34 @@ def merge_params(params: OptParams | Mapping[str, Any] | None) -> OptParams:
         raise TypeError("params must be OptParams, dict, or None")
 
     d = dict(params)
-    # PDF / MATLAB naming
-    if "gammal1" in d and "gamma" not in d:
-        d["gamma"] = d["gammal1"]
-    # Pythonic aliases
+    # Normalize course / MATLAB-style keys before validating the parameter names.
+    # If both a canonical key and an alias are present, keep the canonical key.
     alias_map = {
+        "gammal1": "gamma",
+        "gammal2": "gamma",
         "t_primal_dr": "tprimaldr",
+        "tprimaldr": "tprimaldr",
         "rho_primal_dr": "rhoprimaldr",
+        "rhoprimaldr": "rhoprimaldr",
         "t_primal_dual_dr": "tprimaldualdr",
+        "tprimaldualdr": "tprimaldualdr",
         "rho_primal_dual_dr": "rhoprimaldualdr",
+        "rhoprimaldualdr": "rhoprimaldualdr",
+        "rhoadmm": "rhoadmm",
         "t_admm": "tadmm",
+        "tadmm": "tadmm",
         "rho_admm": "rhoadmm",
+        "tcp": "tcp",
         "t_cp": "tcp",
+        "scp": "scp",
         "s_cp": "scp",
     }
-    for old, new in alias_map.items():
-        if old in d and new not in d:
-            d[new] = d[old]
+    normalized: dict[str, Any] = {}
+    for key, value in d.items():
+        normalized_key = alias_map.get(key, key)
+        if normalized_key not in normalized:
+            normalized[normalized_key] = value
+    d = normalized
 
     valid = {f.name for f in fields(OptParams)}
     unknown = set(d) - valid

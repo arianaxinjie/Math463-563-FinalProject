@@ -24,13 +24,18 @@ from core_code.algorithms.run_common import (
 # -----------------------------------------------------------------------------
 RNG_SEED = 42
 
-PROBLEM = {**DEFAULT_PROBLEM, "blur": {**DEFAULT_PROBLEM["blur"]}}
+PROBLEM = {
+    **DEFAULT_PROBLEM,
+    "gamma": 0.01,
+    "fidelity": "l1",
+    "blur": {**DEFAULT_PROBLEM["blur"]},
+}
 
 SOLVER = {
     "t": 2.0,
     "rho": 0.1,
     "maxiter": 500,
-    "tol": 5e-5,
+    "tol": 1e-4,
     "verbose": True,
     "compute_obj_every": 1,
 }

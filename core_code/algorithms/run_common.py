@@ -29,13 +29,13 @@ _DEFAULT_NAME = "cameraman.jpg"
 OUTPUT_DIR = _ROOT / "output"
 DEFAULT_PROBLEM = {
     "gamma": 0.01,
-    "fidelity": "l2",
+    "fidelity": "l1",
     "blur": {
         "kernel_kind": "gaussian",
         "kernel_size": 15,
         "kernel_sigma": 3.0,
-        "noise_type": "gaussian",
-        "noise_sigma": 0.001,
+        "noise_type": "salt_pepper",
+        "noise_density": 0.05,
         "mode": "periodic",
     },
 }
@@ -142,8 +142,8 @@ _DEFAULT_BLUR_KWARGS: dict = {
     "kernel_kind": "gaussian",
     "kernel_size": 15,
     "kernel_sigma": 3.0,
-    "noise_type": "gaussian",
-    "noise_sigma": 0.001,
+    "noise_type": "salt_pepper",
+    "noise_density": 0.05,
     "mode": "periodic",
 }
 

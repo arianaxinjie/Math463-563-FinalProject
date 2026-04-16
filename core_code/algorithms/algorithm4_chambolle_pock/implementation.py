@@ -114,6 +114,7 @@ def run_chambolle_pock(
     maxiter=500,
     tol=1e-6,
     verbose=True,
+    compute_obj_every=1,
     init_state=None,
 ):
     """
@@ -160,6 +161,7 @@ def run_chambolle_pock(
         maxiter=maxiter,
         tol=tol,
         verbose=verbose,
+        compute_obj_every=compute_obj_every,
     )
 
 
@@ -174,7 +176,14 @@ class ChambollePock:
     def initial_state(self) -> dict:
         return default_chambolle_pock_state(self.model)
 
-    def solve(self, maxiter=500, tol=1e-6, verbose=True, init_state=None):
+    def solve(
+        self,
+        maxiter=500,
+        tol=1e-6,
+        verbose=True,
+        compute_obj_every=1,
+        init_state=None,
+    ):
         return run_chambolle_pock(
             self.model,
             t=self.t,
@@ -182,5 +191,6 @@ class ChambollePock:
             maxiter=maxiter,
             tol=tol,
             verbose=verbose,
+            compute_obj_every=compute_obj_every,
             init_state=init_state,
         )

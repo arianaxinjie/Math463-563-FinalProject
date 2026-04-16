@@ -21,14 +21,20 @@ from core_code.algorithms.run_common import (
 # -----------------------------------------------------------------------------
 RNG_SEED = 42
 
-PROBLEM = {**DEFAULT_PROBLEM, "blur": {**DEFAULT_PROBLEM["blur"]}}
+PROBLEM = {
+    **DEFAULT_PROBLEM,
+    "gamma": 0.01,
+    "fidelity": "l1",
+    "blur": {**DEFAULT_PROBLEM["blur"]},
+}
 
 SOLVER = {
     "t": 1.0,
     "rho": 1.0,
     "maxiter": 500,
-    "tol": 5e-5,
+    "tol": 1e-4,
     "verbose": True,
+    "compute_obj_every": 1,
 }
 
 
@@ -47,6 +53,7 @@ def main():
             "maxiter": SOLVER["maxiter"],
             "tol": SOLVER["tol"],
             "verbose": SOLVER["verbose"],
+            "compute_obj_every": SOLVER["compute_obj_every"],
         },
     )
 

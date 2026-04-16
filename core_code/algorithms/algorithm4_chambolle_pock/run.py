@@ -25,19 +25,25 @@ from core_code.algorithms.run_common import (
 # -----------------------------------------------------------------------------
 RNG_SEED = 42
 
-PROBLEM = {**DEFAULT_PROBLEM, "blur": {**DEFAULT_PROBLEM["blur"]}}
+PROBLEM = {
+    **DEFAULT_PROBLEM,
+    "gamma": 0.01,
+    "fidelity": "l1",
+    "blur": {**DEFAULT_PROBLEM["blur"]},
+}
 
 SOLVER = {
     "maxiter": 500,
-    "tol": 5e-5,
+    "tol": 1e-4,
     "verbose": True,
+    "compute_obj_every": 1,
 }
 
 # Automatic steps: t = s = step_theta / ||A||_2. Set t and s to numbers to override.
 CP_STEPS = {
     "step_theta": 0.5,
-    "t": None,  # e.g. 0.25
-    "s": None,  # e.g. 0.25
+    "t": None,
+    "s": None,
 }
 
 
@@ -61,6 +67,7 @@ def main():
             "maxiter": SOLVER["maxiter"],
             "tol": SOLVER["tol"],
             "verbose": SOLVER["verbose"],
+            "compute_obj_every": SOLVER["compute_obj_every"],
         },
     )
 

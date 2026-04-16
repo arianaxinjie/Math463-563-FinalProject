@@ -32,6 +32,7 @@ def run_solver(
     obj_history = []
     x_prev = None
     converged = False
+    status = "iteration limit reached"
 
     for k in range(1, maxiter + 1):
         state, x_current = step_fn(state, k)
@@ -48,6 +49,7 @@ def run_solver(
             )
             if rel_change < tol:
                 converged = True
+                status = "solved (relative change tolerance reached)"
                 if verbose:
                     print(
                         f"  Converged at iteration {k} "
@@ -62,12 +64,14 @@ def run_solver(
 
     if verbose:
         print(f"\n=== Summary ===")
+        print(f"  Result: {status}")
         print(f"  Iterations: {k}")
         print(f"  Final objective: {final_obj:.6f}")
         print(f"  CPU time: {elapsed:.2f}s")
         print(f"  Converged: {converged}")
 
     info = {
+        "status": status,
         "iterations": k,
         "time": elapsed,
         "converged": converged,

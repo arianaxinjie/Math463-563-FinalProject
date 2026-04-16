@@ -148,6 +148,7 @@ def run_admm(
     maxiter=500,
     tol=1e-6,
     verbose=True,
+    compute_obj_every=1,
     init_state=None,
 ):
     """
@@ -197,6 +198,7 @@ def run_admm(
         maxiter=maxiter,
         tol=tol,
         verbose=verbose,
+        compute_obj_every=compute_obj_every,
     )
 
 
@@ -211,7 +213,14 @@ class ADMM:
     def initial_state(self) -> dict:
         return default_admm_state(self.model)
 
-    def solve(self, maxiter=500, tol=1e-6, verbose=True, init_state=None):
+    def solve(
+        self,
+        maxiter=500,
+        tol=1e-6,
+        verbose=True,
+        compute_obj_every=1,
+        init_state=None,
+    ):
         return run_admm(
             self.model,
             t=self.t,
@@ -219,5 +228,6 @@ class ADMM:
             maxiter=maxiter,
             tol=tol,
             verbose=verbose,
+            compute_obj_every=compute_obj_every,
             init_state=init_state,
         )

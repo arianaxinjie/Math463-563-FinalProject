@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Algorithm 4: Chambolle-Pock (Primal-Dual Hybrid Gradient)
 

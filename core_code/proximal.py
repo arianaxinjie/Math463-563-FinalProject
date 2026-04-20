@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Proximal operators used by all four algorithms.
 

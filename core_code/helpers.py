@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """Small numerical helpers (e.g. Chambolle–Pock step sizes)."""
 
 import numpy as np

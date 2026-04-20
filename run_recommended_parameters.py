@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+
 """
 Run the Section 4.6.6 recommended-parameter experiment from the report.
 

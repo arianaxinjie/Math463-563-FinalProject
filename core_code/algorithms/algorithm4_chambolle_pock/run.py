@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+
 """Run Algorithm 4 (Chambolle–Pock).
 
 From the repository root::

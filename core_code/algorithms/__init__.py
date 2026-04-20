@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """Four splitting algorithms organized as one folder per algorithm."""
 
 from .algorithm1_primal_dr import PrimalDouglasRachford, primal_dr_step

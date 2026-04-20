@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Algorithm 2: Primal-Dual Douglas-Rachford Splitting
 

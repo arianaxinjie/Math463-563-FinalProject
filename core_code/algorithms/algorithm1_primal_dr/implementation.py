@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Algorithm 1: Primal Douglas-Rachford Splitting
 
@@ -90,7 +90,7 @@ class PrimalDouglasRachford:
     model :
         ``DeblurProblem`` (ops, observation ``b``, ``gamma``, ``fidelity``).
     t, rho :
-        DR step and relaxation parameters (same meaning as in the project PDF).
+        DR step and relaxation parameters
     """
 
     def __init__(self, model: DeblurProblem, t: float, rho: float):

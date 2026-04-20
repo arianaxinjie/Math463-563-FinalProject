@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """Single deblurring instance: linear operators, observation, regularization."""
 
 from __future__ import annotations

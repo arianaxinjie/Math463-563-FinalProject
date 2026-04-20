@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Algorithm 3: ADMM (Dual Douglas-Rachford)
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Unified iterative loop shared by all algorithms.
 

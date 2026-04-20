@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """Objective value for monitoring convergence."""
 
 import numpy as np

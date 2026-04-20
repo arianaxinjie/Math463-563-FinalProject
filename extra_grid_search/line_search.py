@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+
 """Parallel one-dimensional search for Algorithm 1's ``t`` parameter.
 
 This is a practical parameter sweep for Primal Douglas-Rachford, not an

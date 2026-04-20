@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+
 """Run Algorithm 1 (Primal Douglas–Rachford).
 
 From the repository root::

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """Plotting and PSNR."""
 
 from __future__ import annotations

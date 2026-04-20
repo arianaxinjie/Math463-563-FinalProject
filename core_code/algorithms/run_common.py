@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 Shared helpers for the per-algorithm ``run.py`` entrypoints.
 

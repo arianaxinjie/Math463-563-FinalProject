@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 FFT-diagonal periodic convolution utilities and the stacked operator
 ``A = [K; D1; D2]`` from the original Colab implementation.

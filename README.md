@@ -60,8 +60,6 @@ If you want only the high-level API, use:
 - helper functions in `core_code` such as `load_image`, `make_kernel`,
   `generate_blurred_noisy_cfg`, `build_problem`, and `show_results`
 
-`utils.py` exists only as a compatibility facade and re-exports the public API.
-
 ## 3. Requirements
 
 Recommended Python version:
@@ -521,16 +519,3 @@ Grid-search tuned parameters:
 
 This distinction is important so that the code, README, and report do not
 contradict one another.
-
-## 16. Compatibility Layer
-
-`utils.py` re-exports the public API and keeps compatibility with older calling
-styles such as `run_admm(...)` and `run_chambolle_pock(...)`.
-
-For new usage, prefer:
-
-```python
-import core_code as cc
-```
-
-and then call `cc.optsolve(...)`.

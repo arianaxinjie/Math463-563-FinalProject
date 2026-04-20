@@ -1,8 +1,14 @@
-# -*- coding: utf-8 -*-
+
 """Image I/O, blur kernels, and synthetic observations from the Colab baseline."""
 
 import numpy as np
 from scipy import ndimage
+
+from PIL import Image
+from skimage.util import random_noise as _random_noise
+
+from .operators import LinearOperators
+from .problem import DeblurProblem
 
 
 def load_image(path, resize_factor=1.0):
@@ -10,13 +16,6 @@ def load_image(path, resize_factor=1.0):
     if isinstance(path, np.ndarray):
         img_array = path
     else:
-        try:
-            from PIL import Image
-        except ImportError as err:
-            raise ImportError(
-                "load_image() needs Pillow to open files. "
-                "Install: pip install pillow"
-            ) from err
         img = Image.open(path)
         if resize_factor != 1.0:
             new_size = (
@@ -99,13 +98,6 @@ def add_noise(
     img = np.asarray(img, dtype=np.float64)
     noise_type = noise_type.lower()
 
-    try:
-        from skimage.util import random_noise as _random_noise
-    except ImportError as err:
-        raise ImportError(
-            "add_noise() requires scikit-image. Install: pip install scikit-image"
-        ) from err
-
     if noise_type == "salt_pepper":
         noisy_img = _random_noise(img, mode="s&p", amount=density)
     elif noise_type == "gaussian":
@@ -177,9 +169,6 @@ def build_problem(
     """
     Convenience: construct ``LinearOperators`` and ``DeblurProblem`` for ``b``'s shape.
     """
-    from .operators import LinearOperators
-    from .problem import DeblurProblem
-
     m, n = b.shape
     ops = LinearOperators(kernel, m, n)
     return DeblurProblem(ops=ops, b=b, gamma=gamma, fidelity=fidelity)

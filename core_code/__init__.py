@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 """
 MATH 463 / COMP 463 image deblurring with TV regularisation.
 
